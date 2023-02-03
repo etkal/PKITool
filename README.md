@@ -1,0 +1,67 @@
+# PKITool
+Certificate management utility
+
+- Basic utility to create certificates
+
+- OpenSSL
+  - This app requires OpenSSL to be located in your ~/ssl (or ~/ssl-debug) directory.
+    - Download OpenSSL and in a terminal window run the provided build script in the Resources folder.
+    - Pass --debug to build a debug version (though this project does not currently use that).
+  - The APIs used here are compatible with OpenSSL 1.1.1.
+- Usage
+
+```
+========================================================================
+PKITool - version 5.1.4
+========================================================================
+
+Usage: pkitool [ rootca|intca|user|client|server|selfserv|crl ] [ -options ]
+
+rootca          Root ca cert generation.
+intca           Intermediate ca cert generation.
+user            User (end entity for any purpose) cert generation.
+client          Client cert generation.
+server          Server cert generation.
+selfserv        Self-signed server cert generation.
+crl             Certificate revocation list (CRL) generation / update.
+print           Print the contents of a .cer file
+
+-out            Output pfx file for saved cert.
+-issuer         Input pfx file for issuer cert to sign with.
+-subject        Subject name string [ default:<filename> ].
+-email          Email address [ default:<none> ].
+-password       Password phrase for pfx used or saved [ default:test ].
+-days           Validity days, like 365, 730 [ default:396 ].
+-key_type       rsa, rsa-pss, ecdsa, ed25519, ed448 [ default:ecdsa ].
+-rsa_size       Key size in bits, like 512, 1024, 2048, 4096 [ default:1024 ].
+-ec_curve       ECDSA curve for Suite B.  p256/p384 [ default:p256 ].
+-sig_hash       Signature hash, default for RSA is sha256, for ECDSA is based on key size.
+-cert           .cer file to be revoked (or unrevoked using removeFromCRL).
+-reason         Reason for revocation.
+-req            Certificate Request (CSR) file to use (PEM format).
+-savekey        Save private key in .key file.
+-der            Save .cer/.key file in DER format instead of base64.
+-renew          Renew existing .pfx
+-config         Location of config file (default is ./pkitool.ini)
+
+Examples:
+        pkitool rootca -out rootca.pfx -subject "My Root CA"
+        pkitool intca -issuer rootca.pfx -out intca.pfx -subject "My Int CA"
+        pkitool user -issuer intca.pfx -out user.pfx -subject "My Cert" -email "me@my.net"
+        pkitool client -issuer intca.pfx -out client.pfx -subject "My Client Cert"
+        pkitool server -issuer intca.pfx -out server.pfx -subject "My Server Cert"
+        pkitool server -issuer intca.pfx -req csr.pem -out server.pfx -subject "My Server Cert"
+        pkitool selfserv -out selfserv.pfx  -subject "My Server Cert"
+        pkitool crl -issuer intca.pfx -cert client.cer -reason keyCompromise
+        pkitool print -cert client.cer
+        pkitool user -issuer intca.pfx -out user.pfx -renew
+        pkitool rootca -out rootca.pfx -renew
+
+Notes:  1. pkitool.ini is the configuration file for cert details.
+        2. Revocation reasons: unspecified, keyCompromise, cACompromise,
+           affiliationChanged, superseded, cessationOfOperation, certificateHold,
+
+========================================================================
+```
+
+  
