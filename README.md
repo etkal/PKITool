@@ -7,6 +7,7 @@ Certificate management utility
   - This app requires OpenSSL to be located in your ~/ssl (or ~/ssl-debug) directory.
     - Download OpenSSL and in a terminal window run the provided build script in the Resources folder.
     - Pass --debug to build a debug version (though this project does not currently use that).
+    - Create a symlink in the project folder to your ssl folder.
   - The APIs used here are compatible with OpenSSL 1.1.1.
 - Usage
 
