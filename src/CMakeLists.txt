@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 3.24)
 project(pkitool C CXX)
 
 add_executable(pkitool)
-message(STATUS "[" ${HOME} "]")
 
-message(STATUS "test 1 2 3")
+message(STATUS "src CMakeLists.txt")
 
 target_sources(pkitool PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/PKITool.cpp

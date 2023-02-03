@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13)
 
 project(PKITool)
 
+message(STATUS "root CMakeLists.txt")
+
 #find_package(OpenSSL 1.1 EXACT)
 
 include_directories(pkitool PUBLIC
@@ -13,5 +15,5 @@ link_directories(pkitool
     ${CMAKE_CURRENT_LIST_DIR}/ssl/lib
 )
 
-add_subdirectory(PKITool)
+add_subdirectory(src)
 
