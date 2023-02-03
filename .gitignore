@@ -3,7 +3,7 @@
 cmake-*
 .DS_Store
 build
-ssl/
+ssl
 
 # Prerequisites
 *.d
