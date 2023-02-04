@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.24)
 
 project(PKITool)
 
@@ -46,15 +46,6 @@ add_library(OpenSSL::Crypto STATIC IMPORTED GLOBAL)
 set_property(TARGET OpenSSL::Crypto PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libcrypto.a)
 set_property(TARGET OpenSSL::Crypto PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
 add_dependencies(OpenSSL::Crypto OpenSSL)
-
-include_directories(pkitool PUBLIC
-    #${CMAKE_CURRENT_LIST_DIR}/PKITool
-    #${CMAKE_CURRENT_LIST_DIR}/ssl/include
-)
-
-link_directories(pkitool
-    #${CMAKE_CURRENT_LIST_DIR}/ssl/lib
-)
 
 add_subdirectory(src)
 
