@@ -3,13 +3,6 @@ Certificate management utility
 
 - Basic utility to create certificates
 
-- OpenSSL
-  - This app requires OpenSSL.
-    - Download and unpack OpenSSL 1.1.1(x).
-    - In a terminal window go to the openssl-1.1.1(x) directory and run the provided build script (from the Resources folder).
-    - Pass --debug to build a debug version.
-    - Create an "ssl" symlink in the project folder to your ssl folder (e.g. `ln -s ~/ssl ./ssl`)
-  - The APIs used here are compatible with OpenSSL 1.1.1.
 - Usage examples:
 
 ```

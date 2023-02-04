@@ -15,9 +15,16 @@ target_sources(pkitool PUBLIC
         
 target_include_directories(pkitool PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
-    ${CMAKE_CURRENT_LIST_DIR}/ssl/include
+    #${CMAKE_CURRENT_LIST_DIR}/ssl/include
 )
 
-target_link_libraries(pkitool libcrypto.a
+target_link_libraries(pkitool
+                      OpenSSL::Crypto
 )
 
+configure_file(${CMAKE_CURRENT_LIST_DIR}/Resources/pkitool.ini
+    ${CMAKE_CURRENT_BINARY_DIR}/pkitool.ini COPYONLY)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/Resources/pkitool.txt
+    ${CMAKE_CURRENT_BINARY_DIR}/pkitool.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/Resources/test.sh
+    ${CMAKE_CURRENT_BINARY_DIR}/test.sh COPYONLY)
