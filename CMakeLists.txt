@@ -6,10 +6,15 @@ message(STATUS "root CMakeLists.txt")
 
 include(ExternalProject)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS "OPENSSL_BUILD_TYPE = ${OPENSSL_BUILD_TYPE}" )
+  set(OPENSSL_BUILD_TYPE "debug")
+endif()
+
 set(OPENSSL_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openssl-src) # default path by CMake
 set(OPENSSL_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/openssl)
 set(OPENSSL_INCLUDE_DIR ${OPENSSL_INSTALL_DIR}/include)
-set(OPENSSL_CONFIGURE_COMMAND ${OPENSSL_SOURCE_DIR}/config)
+set(OPENSSL_CONFIGURE_COMMAND ${OPENSSL_SOURCE_DIR}/Configure)
 set(OPENSSL_BUILD_OPTIONS no-ssl2 no-ssl3 no-hw no-engine no-psk
                           no-srp no-weak-ssl-ciphers -no-shared
                           -mmacosx-version-min=10.15)
@@ -24,6 +29,7 @@ ExternalProject_Add(
     ${OPENSSL_BUILD_OPTIONS}
     --prefix=${OPENSSL_INSTALL_DIR}
     --openssldir=${OPENSSL_INSTALL_DIR}
+    ${OPENSSL_BUILD_TYPE}
   BUILD_COMMAND make
   TEST_COMMAND ""
   INSTALL_COMMAND make install_sw
