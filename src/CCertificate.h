@@ -29,6 +29,7 @@ public:
         long nSerial, long nNotBefore, long nNotAfter, const EVP_MD* pDigest);
 
     int WriteCerFile(string strFile, bool bDer);
+    int WriteReqFile(string strFile, bool bDer);
     int WritePfxFile(string strFile, string& strPassword);
     int WriteCrlFile(string strFile, bool bDer);
     int WriteKeyFile(string strFile, bool bDer);

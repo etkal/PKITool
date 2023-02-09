@@ -26,6 +26,7 @@ print           Print the contents of a .cer file
 -cert           .cer file to be revoked (or unrevoked using removeFromCRL).
 -reason         Reason for revocation.
 -req            Certificate Request (CSR) file to use (PEM format).
+-savereq        Save CSR in .csr file.
 -savekey        Save private key in .key file.
 -der            Save .cer/.key file in DER format instead of base64.
 -renew          Renew existing .pfx

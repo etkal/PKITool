@@ -44,6 +44,7 @@ private:
     string m_strPassword;
     string m_strOutPfx;
     string m_strOutCer;
+    string m_strOutReq;
     string m_strOutKey;
     string m_strOutName;
     string m_strEmail;
@@ -58,6 +59,7 @@ private:
     int     m_nReason;
     bool    m_bSaveKeyToFile;
     bool    m_bSaveKeyBlobToFile;
+    bool    m_bSaveReqToFile;
     bool    m_bSaveCertAsDer;
     bool    m_bRenew;
 

@@ -737,6 +737,34 @@ err:
     return -1;
 }
 
+int CCertificate::WriteReqFile(string strFile, bool bDer)
+{
+    BIO* bio_cert = BIO_new_file(strFile.c_str(), "wb");
+    if (!bio_cert) {
+        printf("Unable to open file \"%s\"\n", strFile.c_str());
+        goto err;
+    }
+    if (bDer) {
+        if (! i2d_X509_REQ_bio(bio_cert, m_pReq)) {
+            printf("Unable to write req to \"%s\"\n", strFile.c_str());
+            goto err;
+        }
+    }
+    else {
+        if (! PEM_write_bio_X509_REQ(bio_cert, m_pReq)) {
+            printf("Unable to write req to \"%s\"\n", strFile.c_str());
+            goto err;
+        }
+    }
+    printf("=> %s saved.\n", strFile.c_str());
+    BIO_free(bio_cert);
+    return 1;
+err:
+    if (bio_cert)
+        BIO_free(bio_cert);
+    return -1;
+}
+
 int CCertificate::ReadCert(string strFile)
 {
     int ret = -1;

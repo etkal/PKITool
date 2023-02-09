@@ -33,6 +33,7 @@ CCertOperation::CCertOperation() :
     m_nReason(kReasonUnspecified),
     m_bSaveKeyToFile(false),
     m_bSaveKeyBlobToFile(false),
+    m_bSaveReqToFile(false),
     m_bSaveCertAsDer(false),
     m_bRenew(false),
     m_nKeyType(EVP_PKEY_NONE),
@@ -185,6 +186,8 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
 #else
             printf("Saving key to blob not supported.\n");
 #endif
+        } else if ( strcmp( pArg, "-savereq" ) == 0 ) {
+            m_bSaveReqToFile = true;
         } else if ( strcmp( pArg, "-der" ) == 0 ) {
             m_bSaveCertAsDer = true;
         } else if ( strcmp( pArg, "-renew" ) == 0 ) {
@@ -362,6 +365,7 @@ good: // (so far)
             m_strOutName = m_strOutPfx.substr(0, nPfxExtOffset); // remove .pfx
             m_strOutCer = m_strOutName + ".cer"; // replace .pfx
             m_strOutKey = m_strOutName + ".key"; // replace .pfx
+            m_strOutReq = m_strOutName + ".csr"; // replace .pfx
             // consider removing path
         }
     }
@@ -733,6 +737,10 @@ int CCertOperation::Execute()
             {
                 oCert.WriteKeyFile(m_strOutKey, m_bSaveCertAsDer);
             }
+        }
+        if (m_bSaveReqToFile)
+        {
+            oCert.WriteReqFile(m_strOutReq, m_bSaveCertAsDer);
         }
     }
     return 1;
