@@ -2,8 +2,20 @@
 Certificate management utility
 
 - Basic utility to create certificates
+- Requires CMake (https://cmake.org)
+- Requires Conan (https://conan.io)
 
-- Usage examples:
+Setup, run before opening VS Code
+- conan install . --build=missing -if build
+- conan install . --build=missing -if build -s build_type=Debug
+
+Building - CLI
+- cmake --preset release
+- cmake --preset release --build
+- cmake --preset debug
+- cmake --preset debug --build
+
+Usage examples:
 
 ```
 ========================================================================

@@ -1,0 +1,12 @@
+[requires]
+openssl/1.1.1t
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[options]
+openssl:shared=False
+
+[layout]
+cmake_layout
