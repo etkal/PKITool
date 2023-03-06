@@ -16,6 +16,7 @@ Building - CLI
 - cmake --preset debug --build
 
 Conan 2.0 changes:
+- conan profile detect  <- Must run once, before the following
 - conan install . --build=missing
 - conan install . --build=missing -s build_type=Debug
 - cmake --preset conan-release
