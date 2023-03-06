@@ -15,6 +15,14 @@ Building - CLI
 - cmake --preset debug
 - cmake --preset debug --build
 
+Conan 2.0 changes:
+- conan install . --build=missing
+- conan install . --build=missing -s build_type=Debug
+- cmake --preset conan-release
+- cmake --preset conan-debug
+- cmake --build --preset conan-release
+- cmake --build --preset conan-debug
+
 Usage examples:
 
 ```

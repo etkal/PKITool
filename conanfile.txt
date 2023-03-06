@@ -6,7 +6,7 @@ CMakeDeps
 CMakeToolchain
 
 [options]
-openssl:shared=False
+openssl/*:shared=False
 
 [layout]
 cmake_layout
