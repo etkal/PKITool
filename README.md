@@ -6,23 +6,19 @@ Certificate management utility
 - Requires Conan (https://conan.io)
 
 Setup, run before opening VS Code
-- conan install . --build=missing -if build
-- conan install . --build=missing -if build -s build_type=Debug
+- conan remote add conancenter https://center.conan.io 
+- conan profile detect  <- Must run once, before the following
+- ./configure.sh  (executes the following)
+  - rm -rf ./build CMakeUserPresets.json
+  - conan install . -pr conan-debug -r conancenter -u --build=missing
+  - conan install . -pr conan-release -r conancenter -u --build=missing
+  - cmake --preset conan-debug
+  - cmake --preset conan-release
 
 Building - CLI
-- cmake --preset release
-- cmake --preset release --build
-- cmake --preset debug
-- cmake --preset debug --build
+- cmake --preset conan-release --build
+- cmake --preset conan-debug --build
 
-Conan 2.0 changes:
-- conan profile detect  <- Must run once, before the following
-- conan install . --build=missing
-- conan install . --build=missing -s build_type=Debug
-- cmake --preset conan-release
-- cmake --preset conan-debug
-- cmake --build --preset conan-release
-- cmake --build --preset conan-debug
 
 Usage examples:
 
