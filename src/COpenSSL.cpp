@@ -24,20 +24,22 @@
 
 #include "COpenSSL.h"
 
-COpenSSL*    COpenSSL::m_pSingleton = NULL;
-unsigned int COpenSSL::m_nUsers = 0;
-BIO*         COpenSSL::m_oStdout = NULL;
+COpenSSL* COpenSSL::m_pSingleton = NULL;
+unsigned int COpenSSL::m_nUsers  = 0;
+BIO* COpenSSL::m_oStdout         = NULL;
 
 COpenSSL::COpenSSL()
 {
-    if ( m_nUsers++ == 0 ) {
+    if (m_nUsers++ == 0)
+    {
         Initialize();
     }
 }
 
 COpenSSL::~COpenSSL()
 {
-    if ( --m_nUsers == 0 ) {
+    if (--m_nUsers == 0)
+    {
         Terminate();
     }
 }
@@ -45,7 +47,7 @@ COpenSSL::~COpenSSL()
 void COpenSSL::Initialize()
 {
     printf("\n");
-    //printf("InitOpenSSL()...\n\n");
+    // printf("InitOpenSSL()...\n\n");
 
     m_oStdout = NULL;
     CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
@@ -55,9 +57,10 @@ void COpenSSL::Initialize()
     m_oStdout = BIO_new_fp(stdout, BIO_NOCLOSE);
 
     int oRand[256];
-    srand( ( unsigned )time( NULL ) );
-    for ( int i=0; i<256; ++i ) {
-        oRand[i] = rand()<<16 | rand();
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < 256; ++i)
+    {
+        oRand[i] = rand() << 16 | rand();
     }
     RAND_seed((void*)oRand, sizeof(oRand));
 }
@@ -79,7 +82,7 @@ void COpenSSL::Terminate()
 
     RAND_cleanup();
     OBJ_cleanup();
-    EVP_cleanup(); 
+    EVP_cleanup();
     ERR_clear_error();
     ERR_free_strings();
     CRYPTO_cleanup_all_ex_data();
@@ -105,4 +108,3 @@ void COpenSSL::PrintError()
     BIO_printf(m_oStdout, "Error Description:\n%s\n", err_msg);
     BIO_printf(m_oStdout, "\n");
 }
-

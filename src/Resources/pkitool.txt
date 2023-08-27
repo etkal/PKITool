@@ -1,5 +1,5 @@
 ========================================================================
-PKITool - version 5.1.4
+PKITool - version 5.1.5
 ========================================================================
 
 Usage: pkitool [ rootca|intca|user|client|server|selfserv|crl ] [ -options ]

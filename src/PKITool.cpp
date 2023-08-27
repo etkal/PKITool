@@ -28,18 +28,17 @@
 
 #include "PKITool.h"
 
-int main(int argc, const char * argv[])
+int main(int argc, const char* argv[])
 {
     COpenSSL oOpenSSL;
 
     CCertOperation oOp;
-    if ( oOp.ReadParameters(argc, argv) <= 0 )
+    if (oOp.ReadParameters(argc, argv) <= 0)
         return 1;
-    if ( oOp.LoadConf() <= 0 )
+    if (oOp.LoadConf() <= 0)
         return 1;
-    if ( oOp.Execute() <= 0 )
+    if (oOp.Execute() <= 0)
         return 1;
 
-	return 0;
+    return 0;
 }
-
