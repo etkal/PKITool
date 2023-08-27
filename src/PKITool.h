@@ -10,9 +10,10 @@
 
 inline int fopen_s(FILE** fp, const char* file, const char* mode)
 {
-    if (!fp) {
+    if (!fp)
+    {
         return 0;
     }
     *fp = fopen(file, mode);
-    return *fp == 0;
+    return (*fp == 0);
 }

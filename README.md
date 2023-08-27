@@ -10,21 +10,23 @@ Setup, run before opening VS Code
 - conan profile detect  <- Must run once, before the following
 - ./configure.sh  (executes the following)
   - rm -rf ./build CMakeUserPresets.json
-  - conan install . -pr conan-debug -r conancenter -u --build=missing
-  - conan install . -pr conan-release -r conancenter -u --build=missing
+  - conan install . -r conancenter --build missing -s build_type=Debug
+  - conan install . -r conancenter --build missing -s build_type=Release
   - cmake --preset conan-debug
   - cmake --preset conan-release
 
+
+
 Building - CLI
-- cmake --preset conan-release --build
-- cmake --preset conan-debug --build
+- cmake --build --preset conan-debug
+- cmake --build --preset conan-release
 
 
 Usage examples:
 
 ```
 ========================================================================
-PKITool - version 5.1.4
+PKITool - version 5.1.5
 ========================================================================
 
 Usage: pkitool [ rootca|intca|user|client|server|selfserv|crl ] [ -options ]

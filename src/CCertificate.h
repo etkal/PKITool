@@ -9,7 +9,8 @@
 
 using namespace std;
 
-class CCertificate {
+class CCertificate
+{
 public:
     CCertificate();
     ~CCertificate();
@@ -25,8 +26,13 @@ public:
 
     int CreateReq(CONF* pConf, const char* szSection, const char* szX509v3ext);
     int CreateReqFromCert();
-    int CreateCert(CONF* pConf, const char* szX509v3ext, CCertificate& oIssuer,
-        long nSerial, long nNotBefore, long nNotAfter, const EVP_MD* pDigest);
+    int CreateCert(CONF* pConf,
+                   const char* szX509v3ext,
+                   CCertificate& oIssuer,
+                   long nSerial,
+                   long nNotBefore,
+                   long nNotAfter,
+                   const EVP_MD* pDigest);
 
     int WriteCerFile(string strFile, bool bDer);
     int WriteReqFile(string strFile, bool bDer);
@@ -37,7 +43,7 @@ public:
     int PrintCert();
     int PrintCrl();
 
-    static int KeyGenCB(int p, int n, BN_GENCB *cb);
+    static int KeyGenCB(int p, int n, BN_GENCB* cb);
     static const EVP_MD* DigestFromSigAlg(int nid);
     static const EVP_MD* DigestFromKey(EVP_PKEY* pKey);
 
@@ -50,7 +56,6 @@ private:
     EVP_PKEY* m_pKey;
     X509_REQ* m_pReq;
     X509_CRL* m_pCrl;
-
 };
 
 

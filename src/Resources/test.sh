@@ -15,7 +15,7 @@
 ./pkitool server -issuer root-ec.pfx -out mycert-ed.pfx -savekey -key_type ed25519
 
 ./pkitool client -issuer root-ec.pfx -out mycert-ec-ec.pfx -savekey -key_type ecdsa
-./pkitool client -issuer root-ec.pfx -out mycert-ec-ec.pfx -renew
+./pkitool client -issuer root-ec.pfx -out mycert-ec-ec.pfx -savekey -renew
 
 ./pkitool user -issuer root-ec.pfx -out user.pfx -subject "My Cert" -email "me@my.net"
 

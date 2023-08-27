@@ -2,7 +2,7 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMakeDeps, cmake_layout
 from conan.tools.env import VirtualBuildEnv
 
-required_conan_version = ">=2.0.1"
+required_conan_version = ">=2.0.5"
 
 
 class ACMEClientLibrary(ConanFile):

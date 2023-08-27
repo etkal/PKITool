@@ -11,17 +11,18 @@ using namespace std;
 
 enum
 {
-    kReasonUnspecified =           0,
-    kReasonKeyCompromise =         1,
-    kReasonCACompromise =          2,
-    kReasonAffiliationChanged =    3,
-    kReasonSuperseded =            4,
-    kReasonCessationOfOperation =  5,
-    kReasonCertificateHold =       6,
-    kReasonRemoveFromCRL =         8 
+    kReasonUnspecified          = 0,
+    kReasonKeyCompromise        = 1,
+    kReasonCACompromise         = 2,
+    kReasonAffiliationChanged   = 3,
+    kReasonSuperseded           = 4,
+    kReasonCessationOfOperation = 5,
+    kReasonCertificateHold      = 6,
+    kReasonRemoveFromCRL        = 8
 };
 
-class CCertOperation {
+class CCertOperation
+{
 public:
     CCertOperation();
     ~CCertOperation();
@@ -34,9 +35,9 @@ private:
     CONF* m_pConf;
 
     string m_strOperation;
-    int     m_nDays;
-    int     m_nKeySize;
-    int     m_nCurve;
+    int m_nDays;
+    int m_nKeySize;
+    int m_nCurve;
     string m_strConfFile;
     string m_strKeyType;
     string m_strCurve;
@@ -56,16 +57,15 @@ private:
     string m_strIssuerCrl;
     string m_strIssuerName;
     string m_strIssuerPassword;
-    int     m_nReason;
-    bool    m_bSaveKeyToFile;
-    bool    m_bSaveKeyBlobToFile;
-    bool    m_bSaveReqToFile;
-    bool    m_bSaveCertAsDer;
-    bool    m_bRenew;
+    int m_nReason;
+    bool m_bSaveKeyToFile;
+    bool m_bSaveKeyBlobToFile;
+    bool m_bSaveReqToFile;
+    bool m_bSaveCertAsDer;
+    bool m_bRenew;
 
-    int     m_nKeyType;
+    int m_nKeyType;
     const EVP_MD* m_pDigest;
-
 };
 
 

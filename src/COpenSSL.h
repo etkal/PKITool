@@ -16,13 +16,17 @@
 #include <openssl/pkcs12.h>
 
 // COpenSSL - Singleton, not thread safe.
-class COpenSSL {
+class COpenSSL
+{
 public:
     COpenSSL();
     ~COpenSSL();
 
     static void PrintError();
-    static BIO* Stdout() { return m_oStdout; }
+    static BIO* Stdout()
+    {
+        return m_oStdout;
+    }
 
 private:
     static void Initialize();
