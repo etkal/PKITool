@@ -87,8 +87,9 @@ void COpenSSL::Terminate()
     ERR_free_strings();
     CRYPTO_cleanup_all_ex_data();
 
-#if defined(_DEBUG)
-    CRYPTO_mem_leaks_fp(stdout);
+#if 0 // Need to undefine OPENSSL_NO_CRYPTO_MDEBUG via conan
+//    CRYPTO_mem_leaks_fp(stdout);
+// or
 //    FILE* fp = fopen("MemLeaks.txt", "w");
 //    if (fp)
 //    {

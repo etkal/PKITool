@@ -18,8 +18,8 @@ target_sources(pkitool PUBLIC
 target_link_libraries(pkitool openssl::openssl)
 
 configure_file(src/Resources/pkitool.ini
-    ${CMAKE_CURRENT_BINARY_DIR}/pkitool.ini COPYONLY)
+    ${CMAKE_BINARY_DIR}/pkitool.ini COPYONLY)
 configure_file(src/Resources/pkitool.txt
-    ${CMAKE_CURRENT_BINARY_DIR}/pkitool.txt COPYONLY)
+    ${CMAKE_BINARY_DIR}/pkitool.txt COPYONLY)
 configure_file(src/Resources/test.sh
-    ${CMAKE_CURRENT_BINARY_DIR}/test.sh COPYONLY)
+    ${CMAKE_BINARY_DIR}/test.sh COPYONLY)
