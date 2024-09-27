@@ -476,7 +476,6 @@ int CCertificate::CreateReq(CONF* pConf, const char* szSection, const char* szX5
         goto err;
     }
 
-    // ###ET###
     memset(&v3ExtCtx, 0, sizeof(v3ExtCtx));
     X509V3_set_ctx(&v3ExtCtx, NULL, NULL, m_pReq, NULL, 0);
     X509V3_set_nconf(&v3ExtCtx, pConf);
@@ -1200,7 +1199,7 @@ int CCertificate::Revoke(CCertificate& oCert, int nReason)
     OPENSSL_free(reason_buf);
     ASN1_ENUMERATED_free(reason_enum);
 
-    X509_EXTENSION_free(crl_entry_ext); // ###ET###
+    X509_EXTENSION_free(crl_entry_ext);
     sk_X509_EXTENSION_free(extensions);
 
     /* Sort the data so it will be written in serial number order */
