@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2018-2022 Erik Tkal. All rights reserved.
+//  Copyright (c) 2018-2024 Erik Tkal. All rights reserved.
 //
 #ifndef _CCERTIFICATE_H
 #define _CCERTIFICATE_H
@@ -48,7 +48,6 @@ public:
     static const EVP_MD* DigestFromKey(EVP_PKEY* pKey);
 
     EVP_PKEY* GetKey();
-    int GetCurve(); // EC curve
     X509* CertX509();
 
 private:

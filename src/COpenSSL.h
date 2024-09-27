@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2018-2022 Erik Tkal. All rights reserved.
+//  Copyright (c) 2018-2024 Erik Tkal. All rights reserved.
 //
 #ifndef _COPENSSL_H
 #define _COPENSSL_H

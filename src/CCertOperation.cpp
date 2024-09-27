@@ -1,7 +1,7 @@
 /*
  * CCertificate.cpp
  *
- * Copyright (c) 2023 Erik Tkal
+ * Copyright (c) 2023-2024 Erik Tkal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,9 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
     argv++;
     argc--;
     if (argc == 0)
+    {
         goto help;
+    }
 
     m_strOperation = *(argv);
     if (m_strOperation != "rootca" && m_strOperation != "intca" && m_strOperation != "user" && m_strOperation != "server" &&
@@ -75,55 +77,73 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
         if (strcmp(pArg, "-config") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strConfFile = *(++argv);
         }
         else if (strcmp(pArg, "-issuer") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strIssuerPfx = *(++argv);
         }
         else if (strcmp(pArg, "-out") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strOutPfx = *(++argv);
         }
         else if (strcmp(pArg, "-email") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strEmail = *(++argv);
         }
         else if (strcmp(pArg, "-subject") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strSubject = *(++argv);
         }
         else if (strcmp(pArg, "-password") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strPassword = *(++argv);
         }
         else if (strcmp(pArg, "-issuerPassword") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strIssuerPassword = *(++argv);
         }
         else if (strcmp(pArg, "-days") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_nDays = atoi(*(++argv));
         }
         else if (strcmp(pArg, "-key_type") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strKeyType = *(++argv);
             if (strcmp(m_strKeyType.c_str(), "rsa") == 0)
             {
@@ -154,7 +174,9 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
         else if (strcmp(pArg, "-rsa_size") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             if (m_nKeyType != EVP_PKEY_RSA && m_nKeyType != EVP_PKEY_RSA_PSS && m_nKeyType != EVP_PKEY_NONE)
             {
                 printf("rsa_size parameter invalid if not RSA.\n");
@@ -165,7 +187,9 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
         else if (strcmp(pArg, "-ec_curve") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             if (m_nKeyType != EVP_PKEY_EC && m_nKeyType != EVP_PKEY_NONE)
             {
                 printf("ec_curve parameter invalid if not ECDSA.\n");
@@ -198,25 +222,33 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
         else if (strcmp(pArg, "-sig_hash") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strSigHash = *(++argv); // will be validated later
         }
         else if (strcmp(pArg, "-cert") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strCert = *(++argv);
         }
         else if (strcmp(pArg, "-crl") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strCrl = *(++argv);
         }
         else if (strcmp(pArg, "-req") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             m_strReq = *(++argv);
         }
         else if (strcmp(pArg, "-savekey") == 0)
@@ -260,28 +292,50 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
         else if (strcmp(pArg, "-reason") == 0)
         {
             if (--argc < 1)
+            {
                 goto bad;
+            }
             const char* tmp = *(++argv);
             if (strcmp(tmp, "unspecified") == 0)
+            {
                 m_nReason = kReasonUnspecified;
+            }
             else if (strcmp(tmp, "keyCompromise") == 0)
+            {
                 m_nReason = kReasonKeyCompromise;
+            }
             else if (strcmp(tmp, "cACompromise") == 0)
+            {
                 m_nReason = kReasonCACompromise;
+            }
             else if (strcmp(tmp, "affiliationChanged") == 0)
+            {
                 m_nReason = kReasonAffiliationChanged;
+            }
             else if (strcmp(tmp, "keyCompromise") == 0)
+            {
                 m_nReason = kReasonKeyCompromise;
+            }
             else if (strcmp(tmp, "superseded") == 0)
+            {
                 m_nReason = kReasonSuperseded;
+            }
             else if (strcmp(tmp, "cessationOfOperation") == 0)
+            {
                 m_nReason = kReasonCessationOfOperation;
+            }
             else if (strcmp(tmp, "certificateHold") == 0)
+            {
                 m_nReason = kReasonCertificateHold;
+            }
             else if (strcmp(tmp, "removeFromCRL") == 0)
+            {
                 m_nReason = kReasonRemoveFromCRL;
+            }
             else
+            {
                 m_nReason = kReasonUnspecified;
+            }
         }
         else
             break;
@@ -289,10 +343,14 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
 
     // Post processing
     if (argc >= 1)
+    {
         goto bad;
+    }
 
     if (m_strOperation.empty())
+    {
         goto bad;
+    }
 
     // Validate the key and signature info
     if (m_nKeyType == EVP_PKEY_NONE)
@@ -338,14 +396,18 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
     if (m_strOperation == "rootca" || m_strOperation == "selfserv")
     {
         if (!m_strCert.empty())
+        {
             printf("Unexpected -cert parameter ignored.\n");
+        }
         if (m_strOutPfx.empty())
         {
             printf("Missing output file.\n");
             goto bad;
         }
         else
+        {
             goto good;
+        }
     }
 
     // normal certs need a subject and an issuer
@@ -359,19 +421,25 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
             goto bad;
         }
         else
+        {
             goto good;
+        }
     }
     else if (m_strOperation == "crl")
     {
         if (!m_strOutPfx.empty())
+        {
             printf("Unexpected -out parameter ignored.\n");
+        }
         if (m_strIssuerPfx.empty() || m_strCert.empty())
         {
             printf("Missing issuer or certificate file.\n");
             goto bad;
         }
         else
+        {
             goto good;
+        }
     }
     else if (m_strOperation == "print")
     {
@@ -381,7 +449,9 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
             goto bad;
         }
         else
+        {
             goto good;
+        }
     }
 
 help:
@@ -482,12 +552,16 @@ static size_t GetSingleLineText(char** ppszMultiLineText, char* pszSingleLineTex
 {
     char* pszNextLineText = NULL;
     if (!(pszNextLineText = strstr(*ppszMultiLineText, "\n")))
+    {
         return 0;
+    }
     // pszNextLineText points to "\nxxxxxxxxxxxxx", so advance it by 1 to point it to next line;
     pszNextLineText++;
     size_t nSingleLineTextLength = pszNextLineText - (*ppszMultiLineText);
     if ((nSingleLineTextLength + 1) > nSingleLineTextMaxLength) // not sufficient buffer
+    {
         return 0;
+    }
     // copy single line
     memcpy(pszSingleLineText, *ppszMultiLineText, nSingleLineTextLength);
     pszSingleLineText[nSingleLineTextLength] = '\0';
@@ -552,13 +626,17 @@ int CCertOperation::LoadConf()
             {
                 // if email specified, use it, otherwise don't echo the line
                 if (!m_strEmail.empty())
+                {
                     snprintf(szModifiedSingleLine, sizeof(szModifiedSingleLine), pszSingleLineText, m_strEmail.c_str());
+                }
             }
             else if ((strstr(pszSingleLineText, "commonName")))
             {
                 // if subject specified, use it, otherwise use the pfx file name
                 if (!m_strSubject.empty())
+                {
                     snprintf(szModifiedSingleLine, sizeof(szModifiedSingleLine), pszSingleLineText, m_strSubject.c_str());
+                }
                 else
                 {
                     snprintf(szModifiedSingleLine, sizeof(szModifiedSingleLine), pszSingleLineText, m_strOutName.c_str());
@@ -568,7 +646,9 @@ int CCertOperation::LoadConf()
             {
                 // if subject specified, use it, otherwise use the pfx file name
                 if (!m_strSubject.empty())
+                {
                     snprintf(szModifiedSingleLine, sizeof(szModifiedSingleLine), pszSingleLineText, m_strSubject.c_str());
+                }
                 else
                 {
                     snprintf(szModifiedSingleLine, sizeof(szModifiedSingleLine), pszSingleLineText, m_strOutName.c_str());
@@ -585,22 +665,26 @@ int CCertOperation::LoadConf()
             strncat(conf_data, pszSingleLineText, sizeof(conf_data) - strlen(conf_data) - 1);
         }
     }
-    // printf( "%s", conf_data );
 
     delete[] pszConfFileText;
-    // exit( 0 );
 
     // get a memory bio for above conf_data
     if (!(bio_mem_conf = BIO_new_mem_buf(conf_data, (int)strlen(conf_data))))
+    {
         goto err;
+    }
     m_pConf = NCONF_new(NULL);
     if (!NCONF_load_bio(m_pConf, bio_mem_conf, 0))
+    {
         goto err;
+    }
 
     ret = 1;
 err:
     if (bio_mem_conf)
+    {
         BIO_free(bio_mem_conf);
+    }
 
     return ret;
 }
@@ -628,7 +712,9 @@ int CCertOperation::Execute()
     if (m_bRenew)
     {
         if (oCert.ReadPfx(m_strOutPfx, m_strPassword) <= 0)
+        {
             goto err;
+        }
     }
 
     // Handle self-signed certificates
@@ -785,18 +871,10 @@ int CCertOperation::Execute()
             // Create a key if we do not have one
             if (!oCert.HasKey())
             {
-                // default to issuer keytype and curve if unspecified
+                // default to EC if unspecified
                 if (m_nKeyType == EVP_PKEY_NONE)
                 {
-                    m_nKeyType = EVP_PKEY_id(oIssuer.GetKey());
-                    if (m_nKeyType == EVP_PKEY_EC)
-                    {
-                        // for ECDSA certificate also get the curve/paramset
-                        if (m_nCurve == 0)
-                        {
-                            m_nCurve = oIssuer.GetCurve();
-                        }
-                    }
+                    m_nKeyType = EVP_PKEY_EC;
                 }
                 // default EC curve
                 if (m_nKeyType == EVP_PKEY_EC && m_nCurve == 0)
@@ -837,7 +915,9 @@ int CCertOperation::Execute()
                              (long)(0 - 15 * 60),
                              (long)(m_nDays * 24 * 60 * 60 - 15 * 60),
                              m_pDigest) <= 0)
+        {
             goto err;
+        }
 
         // Update serial number
         if (fopen_s(&fp, strSerialFile.c_str(), "wb") != 0)

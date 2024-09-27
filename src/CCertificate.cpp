@@ -1,7 +1,7 @@
 /*
  * CCertificate.cpp
  *
- * Copyright (c) 2023 Erik Tkal
+ * Copyright (c) 2023-2024 Erik Tkal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,9 @@ static int copy_extensions_req_to_cert(X509* cert, X509_REQ* req)
             continue;
         }
         if (!X509_add_ext(cert, ext, -1))
+        {
             goto end;
+        }
     }
 
     ret = 1;
@@ -64,7 +66,9 @@ static int copy_extensions_cert_to_req(X509* cert, X509_REQ* req)
     const STACK_OF(X509_EXTENSION)* exts = NULL;
     int ret                              = 0;
     if (!cert || !req)
+    {
         return 1;
+    }
     exts = X509_get0_extensions(cert);
     if (!X509_REQ_add_extensions(req, (STACK_OF(X509_EXTENSION)*)exts))
     {
@@ -151,16 +155,24 @@ int CCertificate::ReadPfx(string strFile, string& strPassword)
 
     /* get bio */
     if (!(bio = BIO_new_file(strFile.c_str(), "rb")))
+    {
         goto err;
+    }
     /* read p12 from bio */
     if (!(p12 = d2i_PKCS12_bio(bio, NULL)))
+    {
         goto err;
+    }
     /* verify the pasword */
     if (!PKCS12_verify_mac(p12, strPassword.c_str(), (int)strPassword.length()))
+    {
         goto err;
+    }
     /* get the auth_safes */
     if (!(auth_safes = PKCS12_unpack_authsafes(p12)))
+    {
         goto err;
+    }
 
     for (int i = 0; i < sk_PKCS7_num(auth_safes); i++)
     {
@@ -240,17 +252,29 @@ int CCertificate::ReadPfx(string strFile, string& strPassword)
 
 err:
     if (key)
+    {
         EVP_PKEY_free(key);
+    }
     if (cert)
+    {
         X509_free(cert);
+    }
     if (p8)
+    {
         PKCS8_PRIV_KEY_INFO_free(p8);
+    }
     if (auth_safes)
+    {
         sk_PKCS7_pop_free(auth_safes, PKCS7_free);
+    }
     if (p12)
+    {
         PKCS12_free(p12);
+    }
     if (bio)
+    {
         BIO_free(bio);
+    }
 
     return ret;
 }
@@ -260,13 +284,21 @@ int CCertificate::KeyGenCB(int p, int n, BN_GENCB* cb)
     char ch = '*';
 
     if (p == 0)
+    {
         ch = '.';
+    }
     else if (p == 1)
+    {
         ch = '+';
+    }
     else if (p == 2)
+    {
         ch = '*';
+    }
     else if (p == 3)
+    {
         ch = '\n';
+    }
 
     printf("%c", ch);
     return 1;
@@ -285,34 +317,50 @@ int CCertificate::GenerateKey(int key_type, int key_size, int nCurve)
 
     pctx = EVP_PKEY_CTX_new_id(key_type, NULL);
     if (!pctx)
+    {
         goto err;
+    }
     if (EVP_PKEY_keygen_init(pctx) <= 0)
+    {
         goto err;
+    }
 
     if (key_type == EVP_PKEY_RSA || key_type == EVP_PKEY_RSA_PSS)
     {
         if (0 >= EVP_PKEY_CTX_ctrl(pctx, key_type, EVP_PKEY_OP_KEYGEN, EVP_PKEY_CTRL_RSA_KEYGEN_BITS, key_size, NULL))
+        {
             goto err;
+        }
         e = BN_new();
         if (!e)
+        {
             goto err;
+        }
         BN_set_word(e, 0x10001);
         if (0 >= EVP_PKEY_CTX_ctrl(pctx, key_type, EVP_PKEY_OP_KEYGEN, EVP_PKEY_CTRL_RSA_KEYGEN_PUBEXP, 0, e))
+        {
             goto err;
+        }
     }
     else if (key_type == EVP_PKEY_EC)
     {
         if (0 >= EVP_PKEY_CTX_ctrl(pctx, key_type, EVP_PKEY_OP_KEYGEN, EVP_PKEY_CTRL_EC_PARAMGEN_CURVE_NID, nCurve, NULL))
+        {
             goto err;
+        }
         if (0 >= EVP_PKEY_CTX_ctrl(pctx, key_type, EVP_PKEY_OP_KEYGEN, EVP_PKEY_CTRL_EC_PARAM_ENC, OPENSSL_EC_NAMED_CURVE, NULL))
+        {
             goto err;
+        }
     }
     else if (key_type == EVP_PKEY_ED25519 || key_type == EVP_PKEY_ED448)
     {
     }
 
     if (EVP_PKEY_keygen(pctx, &key) <= 0)
+    {
         goto err;
+    }
 
     m_pKey = key;
     key    = NULL;
@@ -320,11 +368,17 @@ int CCertificate::GenerateKey(int key_type, int key_size, int nCurve)
 
 err:
     if (key)
+    {
         EVP_PKEY_free(key);
+    }
     if (pctx)
+    {
         EVP_PKEY_CTX_free(pctx);
+    }
     if (pCB)
+    {
         BN_GENCB_free(pCB);
+    }
 
     return ret;
 }
@@ -337,7 +391,9 @@ static int do_sign_init(EVP_MD_CTX* ctx, EVP_PKEY* pkey, const EVP_MD* md)
     int def_nid;
 
     if (ctx == NULL)
+    {
         return 0;
+    }
     // EVP_PKEY_get_default_digest_nid() returns 2 if the digest is mandatory
     // for this algorithm.
     if (EVP_PKEY_get_default_digest_nid(pkey, &def_nid) == 2 && def_nid == NID_undef)
@@ -345,18 +401,34 @@ static int do_sign_init(EVP_MD_CTX* ctx, EVP_PKEY* pkey, const EVP_MD* md)
         /* The signing algorithm requires there to be no digest */
         md = NULL;
     }
-    if (!EVP_DigestSignInit(ctx, &pKeyCtx, md, NULL, pkey))
-        return 0;
-
     int type = EVP_PKEY_type(EVP_PKEY_base_id(pkey));
+    if (!EVP_DigestSignInit(ctx, &pKeyCtx, md, NULL, pkey))
+    {
+        goto err;
+    }
+
     if (type == EVP_PKEY_RSA_PSS)
     {
-        EVP_PKEY_CTX_ctrl(pKeyCtx, type, EVP_PKEY_OP_SIGN, EVP_PKEY_CTRL_RSA_PADDING, RSA_PKCS1_PSS_PADDING, NULL);
-        EVP_PKEY_CTX_ctrl(pKeyCtx, type, EVP_PKEY_OP_SIGN, EVP_PKEY_CTRL_RSA_MGF1_MD, 0, (void*)md);
-        EVP_PKEY_CTX_ctrl(pKeyCtx, type, EVP_PKEY_OP_SIGN, EVP_PKEY_CTRL_RSA_PSS_SALTLEN, -1, NULL);
+        if (EVP_PKEY_CTX_set_rsa_padding(pKeyCtx, RSA_PKCS1_PSS_PADDING) <= 0)
+        {
+            goto err;
+        }
+
+        if (EVP_PKEY_CTX_set_rsa_pss_saltlen(pKeyCtx, -1) <= 0)
+        {
+            goto err;
+        }
+
+        if (EVP_PKEY_CTX_set_rsa_mgf1_md(pKeyCtx, md) <= 0)
+        {
+            goto err;
+        }
     }
 
     return 1;
+
+err:
+    return 0;
 }
 
 
@@ -377,11 +449,17 @@ int CCertificate::CreateReq(CONF* pConf, const char* szSection, const char* szX5
     }
 
     if (!(m_pReq = X509_REQ_new()))
+    {
         goto err;
+    }
     if (!X509_REQ_set_version(m_pReq, 0L)) /* 0 => version 1 certificate request */
+    {
         goto err;
+    }
     if (!(dn = X509_REQ_get_subject_name(m_pReq)))
+    {
         goto err;
+    }
 
     for (int i = 0; i < sk_CONF_VALUE_num(dn_sk_user); i++)
     {
@@ -389,29 +467,39 @@ int CCertificate::CreateReq(CONF* pConf, const char* szSection, const char* szX5
         if (NID_undef == (nid = OBJ_txt2nid(val->name)))
             continue;
         if (!X509_NAME_add_entry_by_NID(dn, nid, MBSTRING_ASC, (unsigned char*)val->value, -1, -1, 0))
+        {
             goto err;
+        }
     }
     if (!X509_REQ_set_pubkey(m_pReq, m_pKey))
+    {
         goto err;
+    }
 
     // ###ET###
     memset(&v3ExtCtx, 0, sizeof(v3ExtCtx));
     X509V3_set_ctx(&v3ExtCtx, NULL, NULL, m_pReq, NULL, 0);
     X509V3_set_nconf(&v3ExtCtx, pConf);
     if (!X509V3_EXT_REQ_add_nconf(pConf, &v3ExtCtx, szX509v3ext, m_pReq))
+    {
         goto err;
+    }
 
     pDigest = DigestFromKey(m_pKey);
 
     pMDCtx = EVP_MD_CTX_new();
     ret    = do_sign_init(pMDCtx, m_pKey, pDigest);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     ret = X509_REQ_sign_ctx(m_pReq, pMDCtx);
     EVP_MD_CTX_free(pMDCtx);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     X509_REQ_print(COpenSSL::Stdout(), m_pReq);
     ret = 1;
@@ -436,7 +524,9 @@ int CCertificate::CreateReqFromCert()
     }
     ret = copy_extensions_cert_to_req(m_pCert, m_pReq);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     X509_REQ_print(COpenSSL::Stdout(), m_pReq);
     ret = 1;
@@ -506,21 +596,6 @@ const EVP_MD* CCertificate::DigestFromKey(EVP_PKEY* pKey)
 }
 
 
-int CCertificate::GetCurve()
-{
-    int pkey_param_nid = NID_undef;
-    switch (EVP_PKEY_base_id(m_pKey))
-    {
-    case EVP_PKEY_EC:
-        pkey_param_nid = EC_GROUP_get_curve_name(EC_KEY_get0_group((const EC_KEY*)EVP_PKEY_get0((EVP_PKEY*)m_pKey)));
-        break;
-    default:
-        break;
-    }
-    return pkey_param_nid;
-}
-
-
 int CCertificate::CreateCert(CONF* pConf,
                              const char* szX509v3ext,
                              CCertificate& oIssuer,
@@ -543,10 +618,14 @@ int CCertificate::CreateCert(CONF* pConf,
     }
 
     if (!(pCert = X509_new()))
+    {
         goto err;
+    }
 
     if (!X509_set_version(pCert, 2)) // 2 => version 3 certificate
+    {
         goto err;
+    }
 
     X509_gmtime_adj(X509_get_notBefore(pCert), nNotBefore);
     X509_gmtime_adj(X509_get_notAfter(pCert), nNotAfter);
@@ -558,14 +637,22 @@ int CCertificate::CreateCert(CONF* pConf,
     X509V3_set_ctx(&pV3ExtCtx, oIssuer.CertX509(), pCert, m_pReq, NULL, 0);
     ASN1_INTEGER_set(X509_get_serialNumber(pCert), nSerial);
     if (!oIssuer.CertX509()) /* self-signed root ca */
+    {
         X509_set_issuer_name(pCert, X509_REQ_get_subject_name(m_pReq));
+    }
     else /* end user issued by issuer */
+    {
         X509_set_issuer_name(pCert, X509_get_subject_name(oIssuer.CertX509()));
+    }
     if (!X509V3_EXT_add_nconf(pConf, &pV3ExtCtx, (char*)szX509v3ext, pCert))
+    {
         goto err;
+    }
     ret = copy_extensions_req_to_cert(pCert, m_pReq);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     pPrivKey = oIssuer.HasKey() ? oIssuer.GetKey() : GetKey();
     pDigest  = pDigest ? pDigest : DigestFromKey(pPrivKey);
@@ -573,11 +660,15 @@ int CCertificate::CreateCert(CONF* pConf,
     pMDCtx = EVP_MD_CTX_new();
     ret    = do_sign_init(pMDCtx, pPrivKey, pDigest);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     ret = X509_sign_ctx(pCert, pMDCtx);
     if (ret <= 0)
+    {
         goto err;
+    }
 
     X509_print(COpenSSL::Stdout(), pCert);
 
@@ -587,9 +678,13 @@ int CCertificate::CreateCert(CONF* pConf,
 
 err:
     if (pCert)
+    {
         X509_free(pCert);
+    }
     if (pMDCtx)
+    {
         EVP_MD_CTX_free(pMDCtx);
+    }
     return ret;
 }
 
@@ -635,23 +730,31 @@ int CCertificate::WritePfxFile(string strFile, string& strPassword)
     BIO* bio_user = NULL;
 
     if (!X509_check_private_key(m_pCert, m_pKey))
+    {
         goto err;
+    }
     X509_digest(m_pCert, EVP_sha1(), keyid, &keyidlen);
 
 
     if (!(certs = sk_X509_new_null()))
+    {
         goto err;
+    }
     sk_X509_push(certs, m_pCert);
     X509_up_ref(m_pCert);
 
     if (!(bags = sk_PKCS12_SAFEBAG_new_null()))
+    {
         goto err;
+    }
     for (i = 0; i < sk_X509_num(certs); i++)
     {
         cert = sk_X509_value(certs, i);
         bag  = PKCS12_x5092certbag(cert);
         if (cert == m_pCert) /* If it matches private key set id */
+        {
             PKCS12_add_localkeyid(bag, keyid, keyidlen);
+        }
         sk_PKCS12_SAFEBAG_push(bags, bag);
     }
     sk_X509_pop_free(certs, X509_free);
@@ -659,47 +762,67 @@ int CCertificate::WritePfxFile(string strFile, string& strPassword)
 
     /* Turn it into unencrypted safe bag */
     if (!(authsafe = PKCS12_pack_p7data(bags)))
+    {
         goto err;
+    }
     sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
     bags = NULL;
 
     if (!(safes = sk_PKCS7_new_null()))
+    {
         goto err;
+    }
     sk_PKCS7_push(safes, authsafe);
 
     /* Make a shrouded key bag */
     if (!(p8 = EVP_PKEY2PKCS8(m_pKey)))
+    {
         goto err;
+    }
     bag = PKCS12_MAKE_SHKEYBAG(NID_pbe_WithSHA1And3_Key_TripleDES_CBC, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, p8);
     PKCS8_PRIV_KEY_INFO_free(p8);
     p8 = NULL;
     PKCS12_add_localkeyid(bag, keyid, keyidlen);
     if (!(bags = sk_PKCS12_SAFEBAG_new_null()))
+    {
         goto err;
+    }
     sk_PKCS12_SAFEBAG_push(bags, bag);
 
     /* Turn it into unencrypted safe bag */
     if (!(authsafe = PKCS12_pack_p7data(bags)))
+    {
         goto err;
+    }
     sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
     bags = NULL;
     sk_PKCS7_push(safes, authsafe);
 
     if (!(p12 = PKCS12_init(NID_pkcs7_data)))
+    {
         goto err;
+    }
     if (!PKCS12_pack_authsafes(p12, safes))
+    {
         goto err;
+    }
     sk_PKCS7_pop_free(safes, PKCS7_free);
     safes = NULL;
     if (!PKCS12_set_mac(p12, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, NULL))
+    {
         goto err;
+    }
 
     if (!strFile.empty())
     {
         if (!(bio_user = BIO_new_file(strFile.c_str(), "wb")))
+        {
             goto err;
+        }
         if (!i2d_PKCS12_bio(bio_user, p12))
+        {
             goto err;
+        }
         if (bio_user)
             BIO_free(bio_user);
         printf("=> %s saved.\n", strFile.c_str());
@@ -710,17 +833,29 @@ int CCertificate::WritePfxFile(string strFile, string& strPassword)
 
 err:
     if (bio_user)
+    {
         BIO_free(bio_user);
+    }
     if (certs)
+    {
         sk_X509_pop_free(certs, X509_free);
+    }
     if (p8)
+    {
         PKCS8_PRIV_KEY_INFO_free(p8);
+    }
     if (safes)
+    {
         sk_PKCS7_pop_free(safes, PKCS7_free);
+    }
     if (bags)
+    {
         sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
+    }
     if (p12)
+    {
         PKCS12_free(p12);
+    }
     return -1;
 }
 
@@ -730,14 +865,18 @@ int CCertificate::WriteCerFile(string strFile, bool bDer)
     if (!bio_cert)
     {
         printf("Unable to open file \"%s\"\n", strFile.c_str());
-        goto err;
+        {
+            goto err;
+        }
     }
     if (bDer)
     {
         if (!i2d_X509_bio(bio_cert, m_pCert))
         {
             printf("Unable to write cert to \"%s\"\n", strFile.c_str());
-            goto err;
+            {
+                goto err;
+            }
         }
     }
     else
@@ -753,7 +892,9 @@ int CCertificate::WriteCerFile(string strFile, bool bDer)
     return 1;
 err:
     if (bio_cert)
+    {
         BIO_free(bio_cert);
+    }
     return -1;
 }
 
@@ -786,7 +927,9 @@ int CCertificate::WriteReqFile(string strFile, bool bDer)
     return 1;
 err:
     if (bio_cert)
+    {
         BIO_free(bio_cert);
+    }
     return -1;
 }
 
@@ -837,7 +980,9 @@ int CCertificate::ReadCert(string strFile)
     ERR_clear_error();
 
     if (m_pCert)
+    {
         ret = 1;
+    }
 
     // err:
     return ret;
@@ -907,7 +1052,9 @@ int CCertificate::ReadCrl(string strFile, bool bCreateIfMissing)
             pMDCtx = EVP_MD_CTX_new();
             ret    = do_sign_init(pMDCtx, m_pKey, DigestFromKey(m_pKey));
             if (ret <= 0)
+            {
                 goto err;
+            }
 
             ret = X509_CRL_sign_ctx(m_pCrl, pMDCtx);
             if (ret <= 0)
@@ -931,7 +1078,9 @@ int CCertificate::ReadCrl(string strFile, bool bCreateIfMissing)
 
 err:
     if (pMDCtx)
+    {
         EVP_MD_CTX_free(pMDCtx);
+    }
     return ret;
 }
 
@@ -1060,7 +1209,9 @@ int CCertificate::Revoke(CCertificate& oCert, int nReason)
     pMDCtx = EVP_MD_CTX_new();
     ret    = do_sign_init(pMDCtx, m_pKey, DigestFromKey(m_pKey));
     if (ret <= 0)
+    {
         goto err;
+    }
 
     ret = X509_CRL_sign_ctx(m_pCrl, pMDCtx);
     if (ret <= 0)
@@ -1107,7 +1258,9 @@ int CCertificate::WriteCrlFile(string strFile, bool bDer)
     ret = 1;
 err:
     if (bio_crl)
+    {
         BIO_free(bio_crl);
+    }
     return ret;
 }
 
@@ -1143,6 +1296,8 @@ int CCertificate::WriteKeyFile(string strFile, bool bDer)
 
 err:
     if (bio_key)
+    {
         BIO_free(bio_key);
+    }
     return ret;
 }

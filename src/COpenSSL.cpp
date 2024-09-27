@@ -1,7 +1,7 @@
 /*
  * COpenSSL.cpp
  *
- * Copyright (c) 2023 Erik Tkal
+ * Copyright (c) 2023-2024 Erik Tkal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,9 +50,7 @@ void COpenSSL::Initialize()
     // printf("InitOpenSSL()...\n\n");
 
     m_oStdout = NULL;
-    CRYPTO_mem_ctrl(CRYPTO_MEM_CHECK_ON);
     OpenSSL_add_all_algorithms();
-    ERR_load_ERR_strings();
     ERR_load_crypto_strings();
     m_oStdout = BIO_new_fp(stdout, BIO_NOCLOSE);
 
