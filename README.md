@@ -26,7 +26,7 @@ Usage examples:
 
 ```
 ========================================================================
-PKITool - version 5.1.5
+PKITool - version 5.2.0
 ========================================================================
 
 Usage: pkitool [ rootca|intca|user|client|server|selfserv|crl ] [ -options ]

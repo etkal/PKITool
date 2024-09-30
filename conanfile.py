@@ -15,8 +15,8 @@ class ACMEClientLibrary(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        self.requires("openssl/1.1.1t")
-        self.requires("boost/1.81.0")
+        self.requires("openssl/3.3.2")
+        self.requires("boost/1.82.0")
 
     def generate(self):
         tc = CMakeToolchain(self)

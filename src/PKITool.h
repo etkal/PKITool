@@ -1,6 +1,6 @@
 //
 //  This version created by Erik Tkal on 2018.02.05.
-//  Copyright (c) 2018-2022 Erik Tkal. All rights reserved.
+//  Copyright (c) 2018-2024 Erik Tkal. All rights reserved.
 //
 #pragma once
 
