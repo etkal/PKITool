@@ -1,7 +1,7 @@
 /*
  * CCertificate.cpp
  *
- * Copyright (c) 2023-2024 Erik Tkal
+ * Copyright (c) 2023-2025 Erik Tkal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -807,7 +807,7 @@ int CCertificate::WritePfxFile(string strFile, string& strPassword)
     }
     sk_PKCS7_pop_free(safes, PKCS7_free);
     safes = NULL;
-    if (!PKCS12_set_mac(p12, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, NULL))
+    if (!PKCS12_set_mac(p12, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, EVP_sha1()))
     {
         goto err;
     }
