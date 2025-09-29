@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2018-2024 Erik Tkal. All rights reserved.
+//  Copyright (c) 2018-2025 Erik Tkal. All rights reserved.
 //
 #ifndef _CCERTOPERATION_H
 #define _CCERTOPERATION_H
@@ -34,7 +34,9 @@ public:
 private:
     CONF* m_pConf;
 
+    string m_strAppPath;
     string m_strOperation;
+    int m_nStart;
     int m_nDays;
     int m_nKeySize;
     int m_nCurve;

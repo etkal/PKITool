@@ -1,7 +1,7 @@
 /*
  * CCertificate.cpp
  *
- * Copyright (c) 2023-2024 Erik Tkal
+ * Copyright (c) 2023-2025 Erik Tkal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,8 @@
 #include "CCertificate.h"
 
 CCertOperation::CCertOperation()
-    : m_nDays(396),
+    : m_nStart(0),
+      m_nDays(396),
       m_nKeySize(0),
       m_nCurve(0),
       m_nReason(kReasonUnspecified),
@@ -54,6 +55,7 @@ CCertOperation::~CCertOperation()
 
 int CCertOperation::ReadParameters(int argc, const char* argv[])
 {
+    m_strAppPath = *(argv);
     argv++;
     argc--;
     if (argc == 0)
@@ -130,6 +132,14 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
             }
             m_strIssuerPassword = *(++argv);
         }
+        else if (strcmp(pArg, "-start") == 0)
+        {
+            if (--argc < 1)
+            {
+                goto bad;
+            }
+            m_nStart = atoi(*(++argv));
+        }
         else if (strcmp(pArg, "-days") == 0)
         {
             if (--argc < 1)
@@ -137,6 +147,10 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
                 goto bad;
             }
             m_nDays = atoi(*(++argv));
+            if (m_nDays < 0)
+            {
+                goto bad;
+            }
         }
         else if (strcmp(pArg, "-key_type") == 0)
         {
@@ -457,7 +471,7 @@ int CCertOperation::ReadParameters(int argc, const char* argv[])
 help:
 {
     FILE* fpReadme = NULL;
-    if (fopen_s(&fpReadme, "pkitool.txt", "rb") == 0 || fopen_s(&fpReadme, "..\\pkitool.txt", "rb") == 0)
+    if (fopen_s(&fpReadme, (m_strAppPath + ".txt").c_str(), "rb") == 0)
     {
         char szReadmeBuf[257];
         size_t nRead = 0;
@@ -769,8 +783,8 @@ int CCertOperation::Execute()
                              szX509v3ext,
                              oIssuer,
                              nSerial,
-                             (long)(0 - 15 * 60),
-                             (long)(m_nDays * 24 * 60 * 60 - 15 * 60),
+                             (long)(m_nStart * 24 * 60 * 60 - 15 * 60),
+                             (long)((m_nStart + m_nDays) * 24 * 60 * 60 - 15 * 60),
                              m_pDigest) <= 0)
         {
             goto err;
@@ -912,8 +926,8 @@ int CCertOperation::Execute()
                              szX509v3ext,
                              oIssuer,
                              nSerial,
-                             (long)(0 - 15 * 60),
-                             (long)(m_nDays * 24 * 60 * 60 - 15 * 60),
+                             (long)(m_nStart * 24 * 60 * 60 - 15 * 60),
+                             (long)((m_nStart + m_nDays) * 24 * 60 * 60 - 15 * 60),
                              m_pDigest) <= 0)
         {
             goto err;

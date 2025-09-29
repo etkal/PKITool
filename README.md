@@ -26,7 +26,7 @@ Usage examples:
 
 ```
 ========================================================================
-PKITool - version 5.2.1
+PKITool - version 5.2.2
 ========================================================================
 
 Usage: pkitool [ rootca|intca|user|client|server|selfserv|crl ] [ -options ]
@@ -45,6 +45,7 @@ print           Print the contents of a .cer file
 -subject        Subject name string [ default:<filename> ].
 -email          Email address [ default:<none> ].
 -password       Password phrase for pfx used or saved [ default:test ].
+-start          Start of validity, in days from now (can be negative) [ default:0 ].
 -days           Validity days, like 365, 730 [ default:396 ].
 -key_type       rsa, rsa-pss, ecdsa, ed25519, ed448 [ default:ecdsa ].
 -rsa_size       Key size in bits, like 512, 1024, 2048, 4096 [ default:1024 ].
