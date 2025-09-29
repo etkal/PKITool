@@ -22,6 +22,10 @@
  * THE SOFTWARE.
  */
 
+#if __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 #include "PKITool.h"
 #include "CCertOperation.h"
 #include "CCertificate.h"
@@ -55,7 +59,20 @@ CCertOperation::~CCertOperation()
 
 int CCertOperation::ReadParameters(int argc, const char* argv[])
 {
+#if __APPLE__
+    char szPath[PATH_MAX] = {0};
+    uint32_t nPathenLen   = sizeof szPath;
+    if (0 == _NSGetExecutablePath(szPath, &nPathenLen))
+    {
+        m_strAppPath = szPath;
+    }
+    else
+    {
+        m_strAppPath = "./pkitool";
+    }
+#else
     m_strAppPath = *(argv);
+#endif
     argv++;
     argc--;
     if (argc == 0)
