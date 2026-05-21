@@ -17,6 +17,7 @@ class PKITool(ConanFile):
     def requirements(self):
         self.requires("openssl/3.4.5")
         self.requires("boost/1.88.0")
+        self.requires("gtest/1.14.0")
 
     def generate(self):
         tc = CMakeToolchain(self)

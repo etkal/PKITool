@@ -714,107 +714,34 @@ int CCertificate::PrintCrl()
 
 int CCertificate::WritePfxFile(string strFile, string& strPassword)
 {
-    PKCS12* p12                    = NULL;
-    STACK_OF(PKCS7)* safes         = NULL;
-    PKCS7* authsafe                = NULL;
-    STACK_OF(PKCS12_SAFEBAG)* bags = NULL;
-    PKCS12_SAFEBAG* bag            = NULL;
-    PKCS8_PRIV_KEY_INFO* p8        = NULL;
-    STACK_OF(X509)* certs          = NULL;
-    X509* cert                     = NULL;
-    unsigned char keyid[EVP_MAX_MD_SIZE];
-    unsigned int keyidlen = 0;
-    int i                 = 0;
-
+    PKCS12* p12 = NULL;
     BIO* bio_user = NULL;
 
     if (!X509_check_private_key(m_pCert, m_pKey))
     {
         goto err;
     }
-    X509_digest(m_pCert, EVP_sha1(), keyid, &keyidlen);
 
-
-    if (!(certs = sk_X509_new_null()))
-    {
-        goto err;
-    }
-    sk_X509_push(certs, m_pCert);
-    X509_up_ref(m_pCert);
-
-    if (!(bags = sk_PKCS12_SAFEBAG_new_null()))
-    {
-        goto err;
-    }
-    for (i = 0; i < sk_X509_num(certs); i++)
-    {
-        cert = sk_X509_value(certs, i);
-        bag  = PKCS12_x5092certbag(cert);
-        if (cert == m_pCert) /* If it matches private key set id */
-        {
-            PKCS12_add_localkeyid(bag, keyid, keyidlen);
-        }
-        sk_PKCS12_SAFEBAG_push(bags, bag);
-    }
-    sk_X509_pop_free(certs, X509_free);
-    certs = NULL;
-
-    /* Turn it into unencrypted safe bag */
-    if (!(authsafe = PKCS12_pack_p7data(bags)))
-    {
-        goto err;
-    }
-    sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
-    bags = NULL;
-
-    if (!(safes = sk_PKCS7_new_null()))
-    {
-        goto err;
-    }
-    sk_PKCS7_push(safes, authsafe);
-
-    /* Make a shrouded key bag */
-    if (!(p8 = EVP_PKEY2PKCS8(m_pKey)))
-    {
-        goto err;
-    }
-    bag = PKCS12_MAKE_SHKEYBAG(NID_pbe_WithSHA1And3_Key_TripleDES_CBC, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, p8);
-    PKCS8_PRIV_KEY_INFO_free(p8);
-    p8 = NULL;
-    PKCS12_add_localkeyid(bag, keyid, keyidlen);
-    if (!(bags = sk_PKCS12_SAFEBAG_new_null()))
-    {
-        goto err;
-    }
-    sk_PKCS12_SAFEBAG_push(bags, bag);
-
-    /* Turn it into unencrypted safe bag */
-    if (!(authsafe = PKCS12_pack_p7data(bags)))
-    {
-        goto err;
-    }
-    sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
-    bags = NULL;
-    sk_PKCS7_push(safes, authsafe);
-
-    if (!(p12 = PKCS12_init(NID_pkcs7_data)))
-    {
-        goto err;
-    }
-    if (!PKCS12_pack_authsafes(p12, safes))
-    {
-        goto err;
-    }
-    sk_PKCS7_pop_free(safes, PKCS7_free);
-    safes = NULL;
-    if (!PKCS12_set_mac(p12, strPassword.c_str(), -1, NULL, 0, PKCS12_DEFAULT_ITER, EVP_sha1()))
+    p12 = PKCS12_create(
+        strPassword.empty() ? NULL : strPassword.c_str(),
+        NULL, /* friendly name */
+        m_pKey,
+        m_pCert,
+        NULL, /* no additional certs */
+        NID_pbe_WithSHA1And3_Key_TripleDES_CBC,
+        0,
+        PKCS12_DEFAULT_ITER,
+        PKCS12_DEFAULT_ITER,
+        0);
+    if (!p12)
     {
         goto err;
     }
 
     if (!strFile.empty())
     {
-        if (!(bio_user = BIO_new_file(strFile.c_str(), "wb")))
+        bio_user = BIO_new_file(strFile.c_str(), "wb");
+        if (!bio_user)
         {
             goto err;
         }
@@ -822,8 +749,8 @@ int CCertificate::WritePfxFile(string strFile, string& strPassword)
         {
             goto err;
         }
-        if (bio_user)
-            BIO_free(bio_user);
+        BIO_free(bio_user);
+        bio_user = NULL;
         printf("=> %s saved.\n", strFile.c_str());
     }
 
@@ -834,22 +761,6 @@ err:
     if (bio_user)
     {
         BIO_free(bio_user);
-    }
-    if (certs)
-    {
-        sk_X509_pop_free(certs, X509_free);
-    }
-    if (p8)
-    {
-        PKCS8_PRIV_KEY_INFO_free(p8);
-    }
-    if (safes)
-    {
-        sk_PKCS7_pop_free(safes, PKCS7_free);
-    }
-    if (bags)
-    {
-        sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
     }
     if (p12)
     {
